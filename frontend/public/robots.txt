@@ -1,0 +1,9 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /checkout
+Disallow: /profile
+Disallow: /orders
+Disallow: /api/
+
+Sitemap: https://novashop.com/sitemap.xml

@@ -1,0 +1,85 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Customer Storefront Design Tokens (Warm Luxury Light Theme) */
+  --store-bg: #FAFAF9;
+  --store-card: #FFFFFF;
+  --store-subtle: #F5F5F4;
+  --store-border: #E7E5E4;
+  --store-text: #0F172A;
+  --store-secondary: #475569;
+  --store-muted: #94A3B8;
+
+  /* Unified Brand Accent (Forest Emerald) */
+  --primary: #059669;
+  --primary-hover: #047857;
+  --primary-light: #ECFDF5;
+  --primary-border: #A7F3D0;
+
+  /* Admin Dashboard Design Tokens (Dark Theme) */
+  --admin-bg: #0B0D10;
+  --admin-sidebar: #101318;
+  --admin-card: #151922;
+  --admin-elevated: #1B2029;
+  --admin-border: #252B35;
+  --admin-border-light: #323B49;
+  --admin-input: #12161F;
+  --admin-text: #F5F7FA;
+  --admin-secondary: #A5ACB8;
+  --admin-muted: #707887;
+
+  /* Semantic Feedback */
+  --success: #10B981;
+  --warning: #F59E0B;
+  --danger: #EF4444;
+  --info: #3B82F6;
+}
+
+@layer base {
+  body {
+    background-color: var(--store-bg);
+    color: var(--store-text);
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D6D3D1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A8A29E;
+}
+
+/* Dark mode scrollbars for admin */
+.admin-dark ::-webkit-scrollbar-track {
+  background: #101318;
+}
+
+.admin-dark ::-webkit-scrollbar-thumb {
+  background: #252B35;
+}
+
+.admin-dark ::-webkit-scrollbar-thumb:hover {
+  background: #323B49;
+}
+
+/* Subtle transitions */
+.transition-luxury {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
