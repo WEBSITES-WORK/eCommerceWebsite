@@ -19,18 +19,35 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
   const { showToast } = useToast();
 
+  // Helper to fetch user's database profile (guarantees role and block status are authoritative)
+  const fetchDbProfile = async (userId) => {
+    if (!isSupabaseConfigured || !userId) return null;
+    try {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('id, email, name, phone, avatar, role, is_blocked')
+        .eq('id', userId)
+        .maybeSingle();
+      if (!error && data) return data;
+    } catch (err) {
+      console.warn('[Auth]: Could not fetch profile from DB:', err);
+    }
+    return null;
+  };
+
   // Helper to format Supabase user into unified app user object
-  const mapSupabaseUser = (sbUser, sbSession) => {
+  const mapSupabaseUser = (sbUser, sbSession, dbProfile = null) => {
     if (!sbUser) return null;
     const metadata = sbUser.user_metadata || {};
     return {
       _id: sbUser.id,
       id: sbUser.id,
       email: sbUser.email,
-      name: metadata.name || metadata.full_name || sbUser.email.split('@')[0],
-      role: metadata.role || 'customer',
-      phone: metadata.phone || '',
-      avatar: metadata.avatar || '',
+      name: dbProfile?.name || metadata.name || metadata.full_name || sbUser.email.split('@')[0],
+      role: dbProfile?.role || 'customer',
+      phone: dbProfile?.phone || metadata.phone || '',
+      avatar: dbProfile?.avatar || metadata.avatar || '',
+      isBlocked: Boolean(dbProfile?.is_blocked),
       emailConfirmed: Boolean(sbUser.email_confirmed_at),
       token: sbSession?.access_token || token,
     };
@@ -47,7 +64,19 @@ export const AuthProvider = ({ children }) => {
           if (error) throw error;
 
           if (mounted && initialSession?.user) {
-            const mapped = mapSupabaseUser(initialSession.user, initialSession);
+            const dbProfile = await fetchDbProfile(initialSession.user.id);
+            if (dbProfile?.is_blocked) {
+              await supabase.auth.signOut();
+              setUser(null);
+              setSession(null);
+              setToken(null);
+              localStorage.removeItem('token');
+              localStorage.removeItem('user');
+              if (mounted) setLoading(false);
+              return;
+            }
+
+            const mapped = mapSupabaseUser(initialSession.user, initialSession, dbProfile);
             setUser(mapped);
             setSession(initialSession);
             setToken(initialSession.access_token);
@@ -67,7 +96,18 @@ export const AuthProvider = ({ children }) => {
 
             if (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'USER_UPDATED') {
               if (newSession?.user) {
-                const mapped = mapSupabaseUser(newSession.user, newSession);
+                const dbProfile = await fetchDbProfile(newSession.user.id);
+                if (dbProfile?.is_blocked) {
+                  await supabase.auth.signOut();
+                  setUser(null);
+                  setSession(null);
+                  setToken(null);
+                  localStorage.removeItem('token');
+                  localStorage.removeItem('user');
+                  return;
+                }
+
+                const mapped = mapSupabaseUser(newSession.user, newSession, dbProfile);
                 setUser(mapped);
                 setSession(newSession);
                 setToken(newSession.access_token);
@@ -235,7 +275,13 @@ export const AuthProvider = ({ children }) => {
         throw err;
       }
 
-      const mapped = mapSupabaseUser(data.user, data.session);
+      const dbProfile = await fetchDbProfile(data.user.id);
+      if (dbProfile?.is_blocked) {
+        await supabase.auth.signOut();
+        throw new Error('This account has been suspended. Please contact support.');
+      }
+
+      const mapped = mapSupabaseUser(data.user, data.session, dbProfile);
       setUser(mapped);
       setSession(data.session);
       setToken(data.session.access_token);
@@ -325,6 +371,33 @@ export const AuthProvider = ({ children }) => {
   };
 
   /**
+   * Change Password (for authenticated user in Profile)
+   */
+  const changePassword = async ({ currentPassword, newPassword }) => {
+    if (isSupabaseConfigured && user?.email) {
+      // Re-authenticate to verify current password
+      const { error: verifyError } = await supabase.auth.signInWithPassword({
+        email: user.email,
+        password: currentPassword,
+      });
+      if (verifyError) {
+        throw new Error('Current password is incorrect');
+      }
+
+      const { error } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+
+      if (error) throw new Error(error.message);
+      showToast('Password updated successfully', 'success');
+      return true;
+    }
+
+    const res = await api.put('/auth/change-password', { currentPassword, newPassword });
+    return res;
+  };
+
+  /**
    * User Logout
    */
   const logout = async (notify = true) => {
@@ -351,18 +424,31 @@ export const AuthProvider = ({ children }) => {
    * Update Profile Details
    */
   const updateProfile = async (data) => {
-    if (isSupabaseConfigured && session?.user) {
-      const { error } = await supabase.auth.updateUser({
+    if (isSupabaseConfigured && (session?.user || user?.id)) {
+      const userId = session?.user?.id || user?.id;
+      const updates = {};
+      if (data.name !== undefined) updates.name = data.name.trim();
+      if (data.phone !== undefined) updates.phone = data.phone.trim();
+      if (data.avatar !== undefined) updates.avatar = data.avatar;
+      updates.updated_at = new Date().toISOString();
+
+      const { error: dbError } = await supabase
+        .from('profiles')
+        .update(updates)
+        .eq('id', userId);
+
+      if (dbError) throw new Error(dbError.message);
+
+      // Keep Auth metadata in sync
+      await supabase.auth.updateUser({
         data: {
-          name: data.name,
-          phone: data.phone,
-          avatar: data.avatar,
+          name: updates.name,
+          phone: updates.phone,
+          avatar: updates.avatar,
         },
       });
 
-      if (error) throw new Error(error.message);
-
-      const updated = { ...user, ...data };
+      const updated = { ...user, ...updates };
       setUser(updated);
       localStorage.setItem('user', JSON.stringify(updated));
       showToast('Profile updated successfully', 'success');
@@ -379,7 +465,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   const isAuthenticated = Boolean(token && user);
-  const isAdmin = isAuthenticated && user.role === 'admin';
+  const isAdmin = isAuthenticated && user.role === 'admin' && !user.isBlocked;
 
   return (
     <AuthContext.Provider
@@ -395,6 +481,7 @@ export const AuthProvider = ({ children }) => {
         resendVerification,
         forgotPassword,
         resetPassword,
+        changePassword,
         logout,
         updateProfile,
       }}

@@ -20,13 +20,25 @@ const ResetPassword = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   useEffect(() => {
-    // If Supabase is configured, check if we have a valid recovery session
+    // If Supabase is configured, check if we have a valid recovery session or PKCE code
     if (isSupabaseConfigured) {
-      supabase.auth.onAuthStateChange(async (event, session) => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const code = urlParams.get('code');
+      if (code) {
+        supabase.auth.exchangeCodeForSession(code).catch((err) => {
+          console.warn('[Auth]: Could not exchange code for session:', err);
+        });
+      }
+
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
         if (event === 'PASSWORD_RECOVERY') {
           console.log('[Auth]: Password recovery event acknowledged.');
         }
       });
+
+      return () => {
+        subscription?.unsubscribe();
+      };
     }
   }, []);
 

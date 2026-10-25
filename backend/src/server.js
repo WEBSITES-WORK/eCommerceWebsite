@@ -55,6 +55,7 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:5173',
   'http://localhost:5174',
+  'https://ecommercewebsite-dusky.vercel.app',
 ];
 
 app.use(
@@ -64,8 +65,10 @@ app.use(
 
       const isAllowed =
         allowedOrigins.includes(origin) ||
-        (process.env.NODE_ENV !== 'production' &&
-          (/^http:\/\/localhost:\d+$/.test(origin) || /^http:\/\/127\.0\.0\.1:\d+$/.test(origin)));
+        origin === 'https://ecommercewebsite-dusky.vercel.app' ||
+        origin.endsWith('.vercel.app') ||
+        (/^http:\/\/localhost:\d+$/.test(origin)) ||
+        (/^http:\/\/127\.0\.0\.1:\d+$/.test(origin));
 
       if (isAllowed) {
         callback(null, true);

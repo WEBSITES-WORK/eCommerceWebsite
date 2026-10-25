@@ -49,20 +49,24 @@ export const supabase = createClient(
  * @returns {string} Clean base site URL without trailing slash
  */
 export const getSiteURL = () => {
-  // 1. Explicitly configured site URL (production custom domain or specific vercel URL)
-  let url = import.meta.env.VITE_SITE_URL;
-
-  // 2. Client-side browser runtime detection (ideal for localhost and Vercel preview branches)
-  if (!url && typeof window !== 'undefined' && window.location?.origin) {
-    url = window.location.origin;
+  // 1. Client-side browser runtime detection (dynamically adapts to localhost or production domain)
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    const origin = window.location.origin.replace(/\/+$/, '');
+    // If not localhost or if no env var, origin is always accurate
+    if (!window.location.hostname.includes('localhost') && !window.location.hostname.includes('127.0.0.1')) {
+      return origin;
+    }
+    return origin;
   }
+
+  // 2. Explicitly configured site URL
+  let url = import.meta.env.VITE_SITE_URL;
 
   // 3. Fallback for static builds
   if (!url) {
-    url = 'http://localhost:5173';
+    url = 'https://ecommercewebsite-dusky.vercel.app';
   }
 
-  // Normalize: ensure no trailing slash
   return url.replace(/\/+$/, '');
 };
 
