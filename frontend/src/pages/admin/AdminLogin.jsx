@@ -9,8 +9,8 @@ const AdminLogin = () => {
   const { showToast } = useToast();
   const navigate = useNavigate();
 
-  const [email, setEmail] = useState('admin@ecommerce.com');
-  const [password, setPassword] = useState('Admin123!');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
@@ -50,6 +50,7 @@ const AdminLogin = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                placeholder="admin@ecommerce.com"
                 className="w-full pl-10 pr-4 py-2.5 bg-[#101318] border border-[#252B35] rounded-xl text-[#F5F7FA] placeholder-[#707887] outline-none focus:border-emerald-500 font-medium"
               />
               <Mail className="w-4 h-4 text-[#707887] absolute left-3.5 top-3" />

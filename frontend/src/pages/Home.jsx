@@ -132,24 +132,37 @@ const Home = () => {
 
           {/* Hero Spotlight Visual */}
           <div className="relative">
-            <div className="aspect-square max-w-md mx-auto rounded-3xl overflow-hidden border border-slate-800 shadow-2xl relative group bg-slate-800">
-              <img
-                src="https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80"
-                alt="Sony WH-1000XM5"
-                className="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent flex flex-col justify-end p-6">
-                <span className="text-[11px] text-emerald-400 font-bold uppercase tracking-wider">
-                  Featured Hardware
-                </span>
-                <h3 className="text-lg font-bold text-white mt-1">
-                  Sony WH-1000XM5 Wireless ANC
-                </h3>
-                <p className="text-sm font-semibold text-slate-300 mt-0.5">
-                  $348.00 <span className="line-through text-xs text-slate-500">$399.99</span>
-                </p>
+            {featuredProducts[0] ? (
+              <Link to={`/products/${featuredProducts[0].slug || featuredProducts[0]._id}`} className="block">
+                <div className="aspect-square max-w-md mx-auto rounded-3xl overflow-hidden border border-slate-800 shadow-2xl relative group bg-slate-800">
+                  <img
+                    src={featuredProducts[0].images?.[0] || 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80'}
+                    alt={featuredProducts[0].title}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-slate-950/20 to-transparent flex flex-col justify-end p-6">
+                    <span className="text-[11px] text-emerald-400 font-bold uppercase tracking-wider">
+                      Featured Spotlight
+                    </span>
+                    <h3 className="text-lg font-bold text-white mt-1 line-clamp-1">
+                      {featuredProducts[0].title}
+                    </h3>
+                    <p className="text-sm font-semibold text-slate-200 mt-0.5">
+                      ${featuredProducts[0].discountPrice || featuredProducts[0].price}
+                      {featuredProducts[0].discountPrice && featuredProducts[0].discountPrice < featuredProducts[0].price && (
+                        <span className="line-through text-xs text-slate-400 ml-2">
+                          ${featuredProducts[0].price}
+                        </span>
+                      )}
+                    </p>
+                  </div>
+                </div>
+              </Link>
+            ) : (
+              <div className="aspect-square max-w-md mx-auto rounded-3xl overflow-hidden border border-slate-800 shadow-2xl bg-slate-850 animate-pulse flex items-center justify-center text-slate-600">
+                <ShoppingBag className="w-12 h-12" />
               </div>
-            </div>
+            )}
           </div>
         </div>
       </section>

@@ -1,0 +1,43 @@
+-- 4. PRODUCT IMAGES
+INSERT INTO public.product_images (
+  id,
+  product_id,
+  image_url,
+  storage_path,
+  alt_text,
+  is_primary,
+  sort_order
+) VALUES
+  ('f0000000-0001-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000001', 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=800&auto=format&fit=crop&q=80', '', 'Sony WH-1000XM5 Wireless Noise-Cancelling Headphones - View 1', true, 0),
+  ('f0000000-0001-0000-0000-000000000002', 'e0000000-0000-0000-0000-000000000001', 'https://images.unsplash.com/photo-1583394838336-acd977736f90?w=800&auto=format&fit=crop&q=80', '', 'Sony WH-1000XM5 Wireless Noise-Cancelling Headphones - View 2', false, 1),
+  ('f0000000-0002-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000002', 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=800&auto=format&fit=crop&q=80', '', 'Apple Watch Series 9 GPS 45mm Aluminum Case - View 1', true, 0),
+  ('f0000000-0002-0000-0000-000000000002', 'e0000000-0000-0000-0000-000000000002', 'https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=800&auto=format&fit=crop&q=80', '', 'Apple Watch Series 9 GPS 45mm Aluminum Case - View 2', false, 1),
+  ('f0000000-0003-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000003', 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=800&auto=format&fit=crop&q=80', '', 'Nike Air Max 270 React Flyknit Sneakers - View 1', true, 0),
+  ('f0000000-0003-0000-0000-000000000002', 'e0000000-0000-0000-0000-000000000003', 'https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=800&auto=format&fit=crop&q=80', '', 'Nike Air Max 270 React Flyknit Sneakers - View 2', false, 1),
+  ('f0000000-0004-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000004', 'https://images.unsplash.com/photo-1610945415295-d9bbf067e59c?w=800&auto=format&fit=crop&q=80', '', 'Samsung Galaxy S24 Ultra 5G (512GB Titanium) - View 1', true, 0),
+  ('f0000000-0004-0000-0000-000000000002', 'e0000000-0000-0000-0000-000000000004', 'https://images.unsplash.com/photo-1580910051074-3eb694886505?w=800&auto=format&fit=crop&q=80', '', 'Samsung Galaxy S24 Ultra 5G (512GB Titanium) - View 2', false, 1),
+  ('f0000000-0005-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000005', 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&auto=format&fit=crop&q=80', '', 'Dyson Supersonic™ Intelligent Hair Dryer - View 1', true, 0),
+  ('f0000000-0006-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000006', 'https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&auto=format&fit=crop&q=80', '', 'Ergonomic Mesh Executive Desk Chair - View 1', true, 0),
+  ('f0000000-0006-0000-0000-000000000002', 'e0000000-0000-0000-0000-000000000006', 'https://images.unsplash.com/photo-1505797149-43b0069ec26b?w=800&auto=format&fit=crop&q=80', '', 'Ergonomic Mesh Executive Desk Chair - View 2', false, 1),
+  ('f0000000-0007-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000007', 'https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=800&auto=format&fit=crop&q=80', '', 'Pro Aerobic High-Tension Resistance Bands Kit - View 1', true, 0),
+  ('f0000000-0008-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000008', 'https://images.unsplash.com/photo-1614594975525-e45190c55d0b?w=800&auto=format&fit=crop&q=80', '', 'Minimalist Matte Ceramic Dinnerware Set (16-Piece) - View 1', true, 0),
+  ('f0000000-0009-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000009', 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=800&auto=format&fit=crop&q=80', '', 'Apple MacBook Pro 16" (M3 Max, 36GB RAM, 1TB SSD) - View 1', true, 0),
+  ('f0000000-0009-0000-0000-000000000002', 'e0000000-0000-0000-0000-000000000009', 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?w=800&auto=format&fit=crop&q=80', '', 'Apple MacBook Pro 16" (M3 Max, 36GB RAM, 1TB SSD) - View 2', false, 1),
+  ('f0000000-0010-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000010', 'https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=800&auto=format&fit=crop&q=80', '', 'Logitech MX Master 3S Performance Wireless Mouse - View 1', true, 0),
+  ('f0000000-0011-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000011', 'https://images.unsplash.com/photo-1518002171953-a080ee817e1f?w=800&auto=format&fit=crop&q=80', '', 'Adidas Ultraboost Light Running Shoes - View 1', true, 0),
+  ('f0000000-0012-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000012', 'https://images.unsplash.com/photo-1558317374-067fb5f30001?w=800&auto=format&fit=crop&q=80', '', 'Dyson V15 Detect™ Absolute Cordless Vacuum - View 1', true, 0),
+  ('f0000000-0013-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000013', 'https://images.unsplash.com/photo-1606813907291-d86efa9b94db?w=800&auto=format&fit=crop&q=80', '', 'Sony PlayStation 5 Slim Console (1TB SSD) - View 1', true, 0),
+  ('f0000000-0014-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000014', 'https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800&auto=format&fit=crop&q=80', '', 'Samsung 34" Odyssey OLED G8 Curved Gaming Monitor - View 1', true, 0),
+  ('f0000000-0015-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000015', 'https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=800&auto=format&fit=crop&q=80', '', 'Logitech MX Mechanical Wireless Illuminated Keyboard - View 1', true, 0),
+  ('f0000000-0016-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000016', 'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?w=800&auto=format&fit=crop&q=80', '', 'Nike Sportswear Tech Fleece Full-Zip Windrunner - View 1', true, 0),
+  ('f0000000-0017-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000017', 'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=800&auto=format&fit=crop&q=80', '', 'Adidas Tiro 23 League Athletic Training Track Pants - View 1', true, 0),
+  ('f0000000-0018-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000018', 'https://images.unsplash.com/photo-1600294037681-c80b4cb5b434?w=800&auto=format&fit=crop&q=80', '', 'Apple AirPods Pro (2nd Generation) with MagSafe Case (USB-C) - View 1', true, 0),
+  ('f0000000-0019-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000019', 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=800&auto=format&fit=crop&q=80', '', 'Dyson Airwrap™ Multi-Styler Complete Long - View 1', true, 0),
+  ('f0000000-0020-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000020', 'https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=800&auto=format&fit=crop&q=80', '', 'Sony Alpha 7 IV Full-Frame Mirrorless Camera Body - View 1', true, 0),
+  ('f0000000-0021-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000021', 'https://images.unsplash.com/photo-1602143407151-7111542de6e8?w=800&auto=format&fit=crop&q=80', '', 'Hydro Pure Double-Wall Insulated Steel Flask (32oz) - View 1', true, 0),
+  ('f0000000-0022-0000-0000-000000000001', 'e0000000-0000-0000-0000-000000000022', 'https://images.unsplash.com/photo-1587826080692-f439cd0b70da?w=800&auto=format&fit=crop&q=80', '', 'Logitech Brio 4K Ultra HD Streaming & Conference Webcam - View 1', true, 0)
+ON CONFLICT (id) DO UPDATE SET
+  image_url = EXCLUDED.image_url,
+  alt_text = EXCLUDED.alt_text,
+  is_primary = EXCLUDED.is_primary,
+  sort_order = EXCLUDED.sort_order;

@@ -3,6 +3,7 @@ import react from '@vitejs/plugin-react';
 
 // https://vitejs.dev/config/
 export default defineConfig({
+  envPrefix: ['VITE_', 'NEXT_PUBLIC_'],
   plugins: [react()],
   build: {
     rollupOptions: {
@@ -11,6 +12,7 @@ export default defineConfig({
           'vendor-react': ['react', 'react-dom', 'react-router-dom'],
           'vendor-icons': ['lucide-react'],
           'vendor-utils': ['axios'],
+          'vendor-supabase': ['@supabase/supabase-js'],
         },
       },
     },

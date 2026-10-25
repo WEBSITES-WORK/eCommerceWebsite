@@ -1,12 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Lock, Mail, Phone, ShoppingCart, ArrowRight } from 'lucide-react';
+import {
+  User,
+  Lock,
+  Mail,
+  Phone,
+  ShoppingCart,
+  ArrowRight,
+  CheckCircle2,
+  RefreshCw,
+  Clock,
+} from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import Button from '../components/ui/Button';
 
 const Register = () => {
-  const { register } = useAuth();
+  const { register, resendVerification } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
@@ -19,6 +29,20 @@ const Register = () => {
   });
   const [loading, setLoading] = useState(false);
 
+  // Email verification state
+  const [needsVerification, setNeedsVerification] = useState(false);
+  const [registeredEmail, setRegisteredEmail] = useState('');
+  const [resending, setResending] = useState(false);
+  const [cooldown, setCooldown] = useState(0);
+
+  useEffect(() => {
+    let timer;
+    if (cooldown > 0) {
+      timer = setTimeout(() => setCooldown((c) => c - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [cooldown]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (formData.password !== formData.confirmPassword) {
@@ -26,15 +50,29 @@ const Register = () => {
       return;
     }
 
+    if (formData.password.length < 6) {
+      showToast('Password must be at least 6 characters long', 'error');
+      return;
+    }
+
     try {
       setLoading(true);
-      await register({
+      const res = await register({
         name: formData.name,
         email: formData.email,
         password: formData.password,
         phone: formData.phone,
       });
-      navigate('/');
+
+      if (res?.needsEmailConfirmation) {
+        setRegisteredEmail(formData.email);
+        setNeedsVerification(true);
+        setCooldown(60);
+        showToast('Account created! Please check your email to verify your account.', 'success');
+      } else {
+        showToast('Account registered successfully! Welcome to NovaShop.', 'success');
+        navigate('/');
+      }
     } catch (err) {
       showToast(err.message || 'Registration failed', 'error');
     } finally {
@@ -42,29 +80,106 @@ const Register = () => {
     }
   };
 
+  const handleResendVerification = async () => {
+    if (!registeredEmail) return;
+    try {
+      setResending(true);
+      await resendVerification(registeredEmail);
+      showToast('Verification email sent! Please check your inbox.', 'success');
+      setCooldown(60);
+    } catch (err) {
+      showToast(err.message || 'Failed to resend verification email', 'error');
+    } finally {
+      setResending(false);
+    }
+  };
+
+  // State: Waiting for Email Verification
+  if (needsVerification) {
+    return (
+      <div className="min-h-[80vh] flex items-center justify-center px-4 sm:px-6 py-12">
+        <div className="max-w-md w-full bg-white rounded-3xl border border-stone-200 shadow-xl p-8 space-y-6 text-center">
+          <div className="w-16 h-16 rounded-3xl bg-emerald-50 text-emerald-600 border border-emerald-200 mx-auto flex items-center justify-center shadow-xs">
+            <Mail className="w-8 h-8" />
+          </div>
+
+          <div className="space-y-2">
+            <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+              Verify Your Email
+            </h1>
+            <p className="text-xs text-stone-600 leading-relaxed">
+              We have dispatched a verification link to:
+            </p>
+            <div className="p-2.5 rounded-xl bg-stone-50 border border-stone-200 font-mono text-xs font-bold text-slate-900 break-all">
+              {registeredEmail}
+            </div>
+            <p className="text-xs text-stone-500 pt-1">
+              Please click the link inside the email to activate your NovaShop account.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/80 text-left space-y-1.5 text-xs text-amber-900">
+            <div className="flex items-center gap-2 font-bold">
+              <Clock className="w-4 h-4 text-amber-600 flex-shrink-0" />
+              <span>Next Steps</span>
+            </div>
+            <p className="text-[11px] text-amber-800 leading-relaxed">
+              1. Open your inbox and look for an email from <strong>NovaShop</strong>.<br />
+              2. Click <strong>Verify Email Address</strong>.<br />
+              3. Check your Spam or Junk folder if you do not see it within a minute.
+            </p>
+          </div>
+
+          <div className="space-y-3 pt-2">
+            <Button
+              variant="outline"
+              size="md"
+              fullWidth
+              loading={resending}
+              disabled={cooldown > 0}
+              icon={RefreshCw}
+              onClick={handleResendVerification}
+            >
+              {cooldown > 0
+                ? `Resend available in ${cooldown}s`
+                : 'Resend Verification Email'}
+            </Button>
+
+            <Link
+              to="/login"
+              className="inline-block text-xs font-semibold text-emerald-600 hover:text-emerald-700 hover:underline pt-2"
+            >
+              Back to Sign In
+            </Link>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 sm:px-6 py-12">
-      <div className="max-w-md w-full bg-white rounded-3xl border border-gray-100 shadow-xl p-6 sm:p-8 space-y-6">
+      <div className="max-w-md w-full bg-white rounded-3xl border border-stone-200 shadow-xl p-6 sm:p-8 space-y-6">
         <div className="text-center space-y-2">
           <Link to="/" className="inline-flex items-center gap-2.5 mb-2 group">
             <div className="w-10 h-10 rounded-xl bg-emerald-600 flex items-center justify-center text-white shadow-sm shadow-emerald-600/25 group-hover:scale-105 transition-transform">
               <ShoppingCart className="w-5 h-5" />
             </div>
-            <span className="text-2xl font-black text-gray-900 tracking-tight">
+            <span className="text-2xl font-black text-slate-900 tracking-tight">
               Nova<span className="text-emerald-600">Shop</span>
             </span>
           </Link>
-          <h1 className="text-xl sm:text-2xl font-extrabold text-gray-900 tracking-tight">
+          <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
             Create an Account
           </h1>
-          <p className="text-xs sm:text-sm text-gray-500">
+          <p className="text-xs sm:text-sm text-stone-500">
             Join thousands of satisfied shoppers worldwide
           </p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-3.5 text-xs">
           <div>
-            <label className="font-bold text-gray-700 block mb-1">Full Name *</label>
+            <label className="font-bold text-slate-700 block mb-1">Full Name *</label>
             <div className="relative">
               <input
                 type="text"
@@ -72,14 +187,14 @@ const Register = () => {
                 placeholder="e.g. Sarah Connor"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-emerald-500 focus:bg-white text-xs font-medium transition"
+                className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl outline-none focus:border-emerald-600 focus:bg-white text-xs font-medium transition"
               />
-              <User className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+              <User className="w-4 h-4 text-stone-400 absolute left-3.5 top-3" />
             </div>
           </div>
 
           <div>
-            <label className="font-bold text-gray-700 block mb-1">Email Address *</label>
+            <label className="font-bold text-slate-700 block mb-1">Email Address *</label>
             <div className="relative">
               <input
                 type="email"
@@ -87,28 +202,28 @@ const Register = () => {
                 placeholder="you@example.com"
                 value={formData.email}
                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-emerald-500 focus:bg-white text-xs font-medium transition"
+                className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl outline-none focus:border-emerald-600 focus:bg-white text-xs font-medium transition"
               />
-              <Mail className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+              <Mail className="w-4 h-4 text-stone-400 absolute left-3.5 top-3" />
             </div>
           </div>
 
           <div>
-            <label className="font-bold text-gray-700 block mb-1">Phone Number</label>
+            <label className="font-bold text-slate-700 block mb-1">Phone Number</label>
             <div className="relative">
               <input
                 type="tel"
                 placeholder="+1 (555) 000-0000"
                 value={formData.phone}
                 onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-emerald-500 focus:bg-white text-xs font-medium transition"
+                className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl outline-none focus:border-emerald-600 focus:bg-white text-xs font-medium transition"
               />
-              <Phone className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+              <Phone className="w-4 h-4 text-stone-400 absolute left-3.5 top-3" />
             </div>
           </div>
 
           <div>
-            <label className="font-bold text-gray-700 block mb-1">Password (min 6 characters) *</label>
+            <label className="font-bold text-slate-700 block mb-1">Password (min 6 characters) *</label>
             <div className="relative">
               <input
                 type="password"
@@ -117,14 +232,14 @@ const Register = () => {
                 placeholder="••••••••"
                 value={formData.password}
                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-emerald-500 focus:bg-white text-xs font-medium transition"
+                className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl outline-none focus:border-emerald-600 focus:bg-white text-xs font-medium transition"
               />
-              <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+              <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-3" />
             </div>
           </div>
 
           <div>
-            <label className="font-bold text-gray-700 block mb-1">Confirm Password *</label>
+            <label className="font-bold text-slate-700 block mb-1">Confirm Password *</label>
             <div className="relative">
               <input
                 type="password"
@@ -133,9 +248,9 @@ const Register = () => {
                 placeholder="••••••••"
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                className="w-full pl-10 pr-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:border-emerald-500 focus:bg-white text-xs font-medium transition"
+                className="w-full pl-10 pr-4 py-2.5 bg-stone-50 border border-stone-200 rounded-xl outline-none focus:border-emerald-600 focus:bg-white text-xs font-medium transition"
               />
-              <Lock className="w-4 h-4 text-gray-400 absolute left-3.5 top-3" />
+              <Lock className="w-4 h-4 text-stone-400 absolute left-3.5 top-3" />
             </div>
           </div>
 
@@ -148,12 +263,12 @@ const Register = () => {
               loading={loading}
               icon={ArrowRight}
             >
-              Complete Registration
+              Create Account
             </Button>
           </div>
         </form>
 
-        <div className="text-center text-xs text-gray-500 pt-1">
+        <div className="text-center text-xs text-stone-500 pt-1">
           Already registered?{' '}
           <Link to="/login" className="font-bold text-emerald-600 hover:underline">
             Sign In here

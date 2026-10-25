@@ -244,7 +244,7 @@ async function runTestSuite() {
     const addRes = await request('/cart', {
       method: 'POST',
       headers: { Authorization: `Bearer ${customerToken}` },
-      body: { productId: testProductId, quantity: 2 },
+      body: { productId: testProductId, quantity: 4 },
     });
     if (addRes.status !== 200 || !addRes.data.success) {
       throw new Error(`Failed to add item to cart: ${addRes.data.message}`);
@@ -254,22 +254,22 @@ async function runTestSuite() {
       throw new Error(`Expected 1 item in cart, got ${cart.items.length}`);
     }
     const item = cart.items[0];
-    if (item.quantity !== 2) {
-      throw new Error(`Expected quantity 2, got ${item.quantity}`);
+    if (item.quantity !== 4) {
+      throw new Error(`Expected quantity 4, got ${item.quantity}`);
     }
 
-    // Update quantity to 3
+    // Update quantity to 5
     const updateRes = await request(`/cart/${item._id}`, {
       method: 'PUT',
       headers: { Authorization: `Bearer ${customerToken}` },
-      body: { quantity: 3 },
+      body: { quantity: 5 },
     });
     if (updateRes.status !== 200 || !updateRes.data.success) {
       throw new Error(`Failed to update cart quantity: ${updateRes.data.message}`);
     }
     const updatedCart = updateRes.data.data;
-    if (updatedCart.items[0].quantity !== 3) {
-      throw new Error(`Expected quantity 3 after update, got ${updatedCart.items[0].quantity}`);
+    if (updatedCart.items[0].quantity !== 5) {
+      throw new Error(`Expected quantity 5 after update, got ${updatedCart.items[0].quantity}`);
     }
   });
 
