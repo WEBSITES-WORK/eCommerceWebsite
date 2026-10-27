@@ -14,7 +14,7 @@ const UserList = () => {
       setLoading(true);
       const res = await api.get(`/auth/users?search=${encodeURIComponent(search)}`);
       if (res.success && res.data) {
-        setUsers(res.data.users);
+        setUsers(Array.isArray(res.data.users) ? res.data.users : Array.isArray(res.data) ? res.data : []);
       }
     } catch (err) {
       console.error('Failed to load users:', err);
@@ -77,12 +77,12 @@ const UserList = () => {
                 <tr>
                   <td colSpan={6} className="text-center py-8 text-[#707887]">Loading users...</td>
                 </tr>
-              ) : users.length === 0 ? (
+              ) : (!users || users.length === 0) ? (
                 <tr>
                   <td colSpan={6} className="text-center py-8 text-[#707887]">No users found.</td>
                 </tr>
               ) : (
-                users.map((u) => (
+                (users || []).map((u) => (
                   <tr key={u._id} className="hover:bg-[#1B2029]/50 transition">
                     <td className="py-3 px-4">
                       <div className="flex items-center gap-2.5">

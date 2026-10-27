@@ -434,7 +434,20 @@ export const handleCatalogRequest = async (url, method, params = {}) => {
   }
 
   // 9. Store Settings
-  if (url === '/settings' || url.startsWith('/settings?') || url === '/admin/settings') {
+  if (
+    url === '/settings' ||
+    url.startsWith('/settings') ||
+    url === '/admin/settings' ||
+    url.startsWith('/admin/settings')
+  ) {
+    let savedSettings = null;
+    try {
+      const stored = localStorage.getItem('nova_store_settings');
+      if (stored) savedSettings = JSON.parse(stored);
+    } catch {
+      // ignore storage errors
+    }
+
     return {
       success: true,
       data: {
@@ -449,6 +462,7 @@ export const handleCatalogRequest = async (url, method, params = {}) => {
         freeShippingThreshold: 99.0,
         announcementBar: '✨ Free express shipping on orders over $99! Use coupon NOVAFIRST for 15% off.',
         showAnnouncement: true,
+        ...(savedSettings || {}),
       },
     };
   }

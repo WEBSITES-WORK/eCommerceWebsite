@@ -21,6 +21,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import api from '../services/api';
+import AdminErrorBoundary from './AdminErrorBoundary';
 
 const navItems = [
   { label: 'Overview', path: '/admin', icon: LayoutDashboard },
@@ -219,7 +220,9 @@ const AdminLayout = ({ children }) => {
 
         {/* Content Body */}
         <main className="p-4 sm:p-6 md:p-8 flex-1 bg-[#0B0D10] text-[#F5F7FA]">
-          {children}
+          <AdminErrorBoundary>
+            {children}
+          </AdminErrorBoundary>
         </main>
       </div>
     </div>

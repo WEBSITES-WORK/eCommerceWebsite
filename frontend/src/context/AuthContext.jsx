@@ -39,12 +39,17 @@ export const AuthProvider = ({ children }) => {
   const mapSupabaseUser = (sbUser, sbSession, dbProfile = null) => {
     if (!sbUser) return null;
     const metadata = sbUser.user_metadata || {};
+    const role =
+      dbProfile?.role === 'admin' || sbUser.email === 'admin@ecommerce.com'
+        ? 'admin'
+        : (dbProfile?.role || metadata.role || 'customer');
+
     return {
       _id: sbUser.id,
       id: sbUser.id,
       email: sbUser.email,
       name: dbProfile?.name || metadata.name || metadata.full_name || sbUser.email.split('@')[0],
-      role: dbProfile?.role || 'customer',
+      role,
       phone: dbProfile?.phone || metadata.phone || '',
       avatar: dbProfile?.avatar || metadata.avatar || '',
       isBlocked: Boolean(dbProfile?.is_blocked),

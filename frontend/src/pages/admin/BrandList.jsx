@@ -97,7 +97,7 @@ const BrandList = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {brands.map((b) => (
+        {(brands || []).map((b) => (
           <div
             key={b._id}
             className="p-5 rounded-2xl bg-[#151922] border border-[#252B35] shadow-xs flex flex-col justify-between space-y-4 hover:border-[#353D4B] transition"

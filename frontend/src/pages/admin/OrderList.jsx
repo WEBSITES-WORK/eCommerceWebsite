@@ -291,11 +291,11 @@ const OrderList = () => {
 
                       <td className="py-3.5 px-4">
                         <span className="font-black text-[#F5F7FA] text-sm">
-                          ${ord.totalPrice?.toFixed(2)}
+                          ${Number(ord.totalPrice || 0).toFixed(2)}
                         </span>
-                        {ord.discountAmount > 0 && (
+                        {Number(ord.discountAmount || 0) > 0 && (
                           <span className="block text-[9px] text-emerald-400 font-semibold">
-                            Saved ${ord.discountAmount.toFixed(2)}
+                            Saved ${Number(ord.discountAmount || 0).toFixed(2)}
                           </span>
                         )}
                       </td>

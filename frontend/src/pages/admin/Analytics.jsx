@@ -52,8 +52,8 @@ const Analytics = () => {
   } = data || {};
 
   // Find max values for chart scale
-  const maxRevenue = Math.max(...salesTrends.map((t) => t.revenue || 0), 100);
-  const maxOrders = Math.max(...salesTrends.map((t) => t.orders || 0), 10);
+  const maxRevenue = Math.max(...(salesTrends || []).map((t) => Number(t.revenue || 0)), 100);
+  const maxOrders = Math.max(...(salesTrends || []).map((t) => Number(t.orders || 0)), 10);
 
   return (
     <div className="space-y-6">
@@ -113,7 +113,7 @@ const Analytics = () => {
               <DollarSign className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-[#F5F7FA]">${totalRevenue.toFixed(2)}</p>
+          <p className="text-2xl font-black text-[#F5F7FA]">${Number(totalRevenue || 0).toFixed(2)}</p>
           <div className="flex items-center gap-1 text-[11px] text-emerald-400 font-semibold">
             <ArrowUpRight className="w-3.5 h-3.5" />
             <span>Active transactions</span>
@@ -130,7 +130,7 @@ const Analytics = () => {
               <ShoppingBag className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-[#F5F7FA]">{totalOrders}</p>
+          <p className="text-2xl font-black text-[#F5F7FA]">{totalOrders || 0}</p>
           <p className="text-[11px] text-[#707887] font-medium">Orders fulfilled or pending</p>
         </div>
 
@@ -144,7 +144,7 @@ const Analytics = () => {
               <TrendingUp className="w-4 h-4" />
             </div>
           </div>
-          <p className="text-2xl font-black text-[#F5F7FA]">${averageOrderValue.toFixed(2)}</p>
+          <p className="text-2xl font-black text-[#F5F7FA]">${Number(averageOrderValue || 0).toFixed(2)}</p>
           <p className="text-[11px] text-[#707887] font-medium">Per checkout conversion</p>
         </div>
 
@@ -227,8 +227,8 @@ const Analytics = () => {
                       <span>{point.date}</span>
                       <span className="font-bold text-emerald-400">
                         {activeChartTab === 'revenue'
-                          ? `$${point.revenue.toFixed(2)}`
-                          : `${point.orders} orders`}
+                          ? `$${Number(point.revenue || 0).toFixed(2)}`
+                          : `${point.orders || 0} orders`}
                       </span>
                     </div>
 
@@ -246,7 +246,7 @@ const Analytics = () => {
 
                     {/* Date label */}
                     <span className="text-[10px] text-[#707887] font-medium truncate max-w-[44px]">
-                      {point.date.slice(5)}
+                      {typeof point.date === 'string' ? point.date.slice(5) : point.date}
                     </span>
                   </div>
                 );
@@ -275,17 +275,17 @@ const Analytics = () => {
                     <span className="font-bold text-[#F5F7FA]">{cat.category}</span>
                     <div className="text-right">
                       <span className="font-black text-[#F5F7FA] mr-2">
-                        ${cat.revenue?.toFixed(2)}
+                        ${Number(cat.revenue || 0).toFixed(2)}
                       </span>
                       <span className="text-[10px] text-[#707887] font-bold">
-                        ({cat.percentage}%)
+                        ({cat.percentage || 0}%)
                       </span>
                     </div>
                   </div>
                   <div className="w-full h-2 rounded-full bg-[#101318] overflow-hidden">
                     <div
                       className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min(100, cat.percentage)}%` }}
+                      style={{ width: `${Math.min(100, cat.percentage || 0)}%` }}
                     />
                   </div>
                 </div>
@@ -335,7 +335,7 @@ const Analytics = () => {
                       </td>
                       <td className="py-2.5 text-[#A5ACB8] font-semibold">{p.totalUnits}</td>
                       <td className="py-2.5 text-right font-black text-[#F5F7FA]">
-                        ${p.totalRevenue?.toFixed(2)}
+                        ${Number(p.totalRevenue || 0).toFixed(2)}
                       </td>
                     </tr>
                   ))

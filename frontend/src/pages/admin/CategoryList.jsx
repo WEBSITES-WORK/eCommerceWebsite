@@ -95,7 +95,7 @@ const CategoryList = () => {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-        {categories.map((cat) => (
+        {(categories || []).map((cat) => (
           <div
             key={cat._id}
             className="p-5 rounded-2xl bg-[#151922] border border-[#252B35] shadow-xs flex flex-col justify-between space-y-4 hover:border-[#353D4B] transition"

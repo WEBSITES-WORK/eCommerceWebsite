@@ -354,6 +354,17 @@ const Navbar = () => {
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
         <div className="md:hidden border-t border-slate-100 bg-white px-4 pt-3 pb-6 space-y-3">
+          {isAdmin && (
+            <Link
+              to="/admin"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-2 py-2 text-sm font-bold text-emerald-700 bg-emerald-50 px-3 rounded-xl border border-emerald-100 transition"
+            >
+              <Shield className="w-4 h-4 text-emerald-600" />
+              Admin Dashboard
+            </Link>
+          )}
+
           <Link
             to="/products"
             onClick={() => setMobileMenuOpen(false)}

@@ -56,24 +56,25 @@ const Analytics = lazy(() => import('./pages/admin/Analytics'));
 const Settings = lazy(() => import('./pages/admin/Settings'));
 const NotificationList = lazy(() => import('./pages/admin/NotificationList'));
 
-const PageFallback = () => (
-  <div className="min-h-[60vh] flex items-center justify-center">
+const PageFallback = ({ isAdmin }) => (
+  <div className={`min-h-screen flex items-center justify-center ${isAdmin ? 'bg-[#0B0D10]' : 'bg-gray-50'}`}>
     <div className="flex flex-col items-center gap-3">
-      <div className="w-10 h-10 border-3 border-emerald-600 border-t-transparent rounded-full animate-spin" />
-      <span className="text-xs font-semibold text-slate-400">Loading experience...</span>
+      <div className="w-10 h-10 border-3 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+      <span className={`text-xs font-semibold ${isAdmin ? 'text-[#707887]' : 'text-slate-400'}`}>Loading experience...</span>
     </div>
   </div>
 );
 
 const AppContent = () => {
   const location = useLocation();
+  const isAdminRoute = location.pathname.startsWith('/admin');
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50 text-gray-900 font-sans">
-      {!location.pathname.startsWith('/admin') && <Navbar />}
+    <div className={`flex flex-col min-h-screen font-sans ${isAdminRoute ? 'bg-[#0B0D10] text-[#F5F7FA]' : 'bg-gray-50 text-gray-900'}`}>
+      {!isAdminRoute && <Navbar />}
 
       <main className="flex-1">
-        <Suspense fallback={<PageFallback />}>
+        <Suspense fallback={<PageFallback isAdmin={isAdminRoute} />}>
           <Routes>
             {/* Customer Routes */}
             <Route path="/" element={<Home />} />
@@ -296,11 +297,16 @@ const AppContent = () => {
             <Route
               path="*"
               element={
-                <div className="py-24 text-center space-y-4">
-                  <h1 className="text-4xl font-extrabold text-gray-900">404</h1>
-                  <p className="text-xs text-gray-500">The page you were looking for could not be found.</p>
-                  <a href="/" className="inline-block px-5 py-2.5 bg-emerald-600 text-white text-xs font-bold rounded-xl">
-                    Back to Homepage
+                <div className={`py-24 text-center space-y-4 ${isAdminRoute ? 'text-[#F5F7FA]' : 'text-gray-900'}`}>
+                  <h1 className="text-4xl font-extrabold">404</h1>
+                  <p className={`text-xs ${isAdminRoute ? 'text-[#707887]' : 'text-gray-500'}`}>
+                    The page you were looking for could not be found.
+                  </p>
+                  <a
+                    href={isAdminRoute ? '/admin' : '/'}
+                    className="inline-block px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold rounded-xl transition"
+                  >
+                    {isAdminRoute ? 'Back to Admin Console' : 'Back to Homepage'}
                   </a>
                 </div>
               }

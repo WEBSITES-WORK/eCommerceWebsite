@@ -78,8 +78,8 @@ const Dashboard = () => {
     categoryBreakdown = [],
   } = data || {};
 
-  const maxDaySale = Math.max(...dailySales.map((d) => d.sales), 100);
-  const maxDayOrders = Math.max(...dailySales.map((d) => d.orders), 5);
+  const maxDaySale = Math.max(...(dailySales || []).map((d) => Number(d.sales || 0)), 100);
+  const maxDayOrders = Math.max(...(dailySales || []).map((d) => Number(d.orders || 0)), 5);
 
   return (
     <div className="space-y-8">
@@ -127,7 +127,7 @@ const Dashboard = () => {
             </div>
           </div>
           <p className="text-2xl sm:text-3xl font-extrabold text-[#F5F7FA] tracking-tight">
-            ${(summary.totalSales || summary.totalRevenue || 0).toFixed(2)}
+            ${Number(summary.totalSales ?? summary.totalRevenue ?? 0).toFixed(2)}
           </p>
           <div className="flex items-center gap-1.5 text-xs text-emerald-400 font-medium pt-1">
             <TrendingUp className="w-3.5 h-3.5" />
@@ -146,7 +146,7 @@ const Dashboard = () => {
             </div>
           </div>
           <p className="text-2xl sm:text-3xl font-extrabold text-[#F5F7FA] tracking-tight">
-            ${(summary.todayRevenue || 0).toFixed(2)}
+            ${Number(summary.todayRevenue || 0).toFixed(2)}
           </p>
           <p className="text-xs text-[#707887] pt-1">
             Settled orders since 12:00 AM
@@ -164,7 +164,7 @@ const Dashboard = () => {
             </div>
           </div>
           <p className="text-2xl sm:text-3xl font-extrabold text-[#F5F7FA] tracking-tight">
-            ${(summary.monthlyRevenue || 0).toFixed(2)}
+            ${Number(summary.monthlyRevenue || 0).toFixed(2)}
           </p>
           <p className="text-xs text-[#707887] pt-1">
             Current calendar month gross
@@ -305,15 +305,16 @@ const Dashboard = () => {
 
           {/* Dynamic Dark Bar Chart */}
           <div className="pt-6 grid grid-cols-7 gap-2.5 sm:gap-4 items-end h-64 border-b border-[#252B35]/60 pb-2">
-            {dailySales.map((day) => {
-              const val = activeChartTab === 'revenue' ? day.sales : day.orders;
+            {(dailySales || []).map((day, idx) => {
+              const val = activeChartTab === 'revenue' ? Number(day.sales || 0) : Number(day.orders || 0);
               const maxVal = activeChartTab === 'revenue' ? maxDaySale : maxDayOrders;
               const heightPct = Math.max(10, Math.round((val / (maxVal || 1)) * 100));
+              const dayLabel = day.label || day.date || `Day ${idx + 1}`;
 
               return (
-                <div key={day.date} className="flex flex-col items-center gap-2 h-full justify-end group">
+                <div key={day.date || idx} className="flex flex-col items-center gap-2 h-full justify-end group">
                   <span className="text-[10px] font-bold text-emerald-400 opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
-                    {activeChartTab === 'revenue' ? `$${day.sales.toFixed(0)}` : `${day.orders} ord`}
+                    {activeChartTab === 'revenue' ? `$${Number(day.sales || 0).toFixed(0)}` : `${day.orders || 0} ord`}
                   </span>
 
                   <div
@@ -323,11 +324,11 @@ const Dashboard = () => {
                         : 'bg-sky-500/70 group-hover:bg-sky-500'
                     }`}
                     style={{ height: `${heightPct}%` }}
-                    title={`${day.label}: $${day.sales.toFixed(2)} (${day.orders} orders)`}
+                    title={`${dayLabel}: $${Number(day.sales || 0).toFixed(2)} (${day.orders || 0} orders)`}
                   />
 
                   <span className="text-[10px] text-[#707887] font-medium truncate max-w-full">
-                    {day.label.split(',')[0]}
+                    {typeof dayLabel === 'string' ? dayLabel.split(',')[0] : dayLabel}
                   </span>
                 </div>
               );
@@ -348,25 +349,25 @@ const Dashboard = () => {
           </div>
 
           <div className="space-y-4 pt-1">
-            {categoryBreakdown.length === 0 ? (
+            {(!categoryBreakdown || categoryBreakdown.length === 0) ? (
               <p className="text-xs text-[#707887] py-8 text-center">No category sales recorded yet.</p>
             ) : (
-              categoryBreakdown.map((cat) => (
-                <div key={cat.category} className="space-y-1.5 text-xs">
+              categoryBreakdown.map((cat, idx) => (
+                <div key={cat.category || cat.name || idx} className="space-y-1.5 text-xs">
                   <div className="flex justify-between items-center font-medium">
-                    <span className="text-[#F5F7FA]">{cat.category}</span>
+                    <span className="text-[#F5F7FA]">{cat.category || cat.name || 'Category'}</span>
                     <span className="text-emerald-400 font-bold">
-                      ${cat.total.toFixed(2)}{' '}
-                      <span className="text-[10px] text-[#707887] font-normal">({cat.percentage}%)</span>
+                      ${Number(cat.total || 0).toFixed(2)}{' '}
+                      <span className="text-[10px] text-[#707887] font-normal">({cat.percentage || 0}%)</span>
                     </span>
                   </div>
                   <div className="w-full h-1.5 rounded-full bg-[#101318] overflow-hidden border border-[#252B35]">
                     <div
                       className="h-full bg-emerald-500 rounded-full transition-all duration-500"
-                      style={{ width: `${Math.min(100, Math.max(4, cat.percentage))}%` }}
+                      style={{ width: `${Math.min(100, Math.max(4, cat.percentage || 0))}%` }}
                     />
                   </div>
-                  <span className="text-[10px] text-[#707887] block">{cat.count} units fulfilled</span>
+                  <span className="text-[10px] text-[#707887] block">{cat.count || 0} units fulfilled</span>
                 </div>
               ))
             )}
@@ -392,7 +393,12 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3.5">
-          {topProducts.map((p, idx) => (
+          {(!topProducts || topProducts.length === 0) ? (
+            <div className="col-span-full py-8 text-center text-xs text-[#707887]">
+              No sales performance records found.
+            </div>
+          ) : (
+            topProducts.map((p, idx) => (
             <div
               key={p._id || idx}
               className="p-3.5 rounded-xl bg-[#101318] border border-[#252B35] flex items-center gap-3.5"
@@ -412,15 +418,17 @@ const Dashboard = () => {
                 <p className="font-semibold text-xs text-[#F5F7FA] truncate">{p.title}</p>
                 <div className="flex items-center justify-between text-xs mt-1">
                   <span className="font-bold text-emerald-400">
-                    ${p.totalRevenue?.toFixed(0)} <span className="text-[10px] text-[#707887] font-normal">gross</span>
+                    ${Number(p.totalRevenue ?? p.revenue ?? 0).toFixed(0)}{' '}
+                    <span className="text-[10px] text-[#707887] font-normal">gross</span>
                   </span>
                   <Badge variant="adminDark" size="xs">
-                    {p.totalSold} sold
+                    {p.totalSold ?? p.salesCount ?? 0} sold
                   </Badge>
                 </div>
               </div>
             </div>
-          ))}
+          ))
+        )}
         </div>
       </div>
 
@@ -456,7 +464,14 @@ const Dashboard = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-[#252B35]/60">
-                {recentOrders.map((ord) => (
+                {(!recentOrders || recentOrders.length === 0) ? (
+                  <tr>
+                    <td colSpan={6} className="text-center py-8 text-[#707887]">
+                      No recent orders placed yet.
+                    </td>
+                  </tr>
+                ) : (
+                  recentOrders.map((ord) => (
                   <tr key={ord._id} className="hover:bg-[#1B2029] transition-colors">
                     <td className="py-3 px-3 font-mono font-medium text-emerald-400">
                       {ord.orderNumber}
@@ -469,7 +484,7 @@ const Dashboard = () => {
                       {ord.orderItems?.length} items
                     </td>
                     <td className="py-3 px-3 font-semibold text-[#F5F7FA]">
-                      ${ord.totalPrice?.toFixed(2)}
+                      ${Number(ord.totalPrice || 0).toFixed(2)}
                     </td>
                     <td className="py-3 px-3">
                       <Badge
@@ -498,7 +513,8 @@ const Dashboard = () => {
                       </Link>
                     </td>
                   </tr>
-                ))}
+                ))
+              )}
               </tbody>
             </table>
           </div>
@@ -522,7 +538,10 @@ const Dashboard = () => {
           </div>
 
           <div className="divide-y divide-[#252B35]/60">
-            {recentCustomers.map((cust) => (
+            {(!recentCustomers || recentCustomers.length === 0) ? (
+              <p className="text-xs text-[#707887] py-8 text-center">No customer accounts registered yet.</p>
+            ) : (
+              recentCustomers.map((cust) => (
               <div key={cust._id} className="py-3 flex items-center justify-between gap-3 text-xs">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-8 h-8 rounded-lg bg-[#1B2029] border border-[#252B35] text-emerald-400 text-xs font-bold flex items-center justify-center flex-shrink-0">
@@ -536,12 +555,13 @@ const Dashboard = () => {
 
                 <div className="text-right flex-shrink-0">
                   <span className="font-bold text-emerald-400 block text-xs">
-                    ${cust.totalSpent?.toFixed(0) || 0}
+                    ${Number(cust.totalSpent || 0).toFixed(0)}
                   </span>
-                  <span className="text-[10px] text-[#707887]">{cust.orderCount || 0} orders</span>
+                  <span className="text-[10px] text-[#707887]">{cust.orderCount || cust.ordersCount || 0} orders</span>
                 </div>
               </div>
-            ))}
+            ))
+          )}
           </div>
         </div>
       </div>
@@ -601,7 +621,7 @@ const Dashboard = () => {
                     </td>
                     <td className="py-3 px-3 font-mono text-[11px] text-[#A5ACB8]">{p.sku}</td>
                     <td className="py-3 px-3 text-[#A5ACB8]">{p.category?.name || 'General'}</td>
-                    <td className="py-3 px-3 font-semibold text-[#F5F7FA]">${p.price?.toFixed(2)}</td>
+                    <td className="py-3 px-3 font-semibold text-[#F5F7FA]">${Number(p.price || 0).toFixed(2)}</td>
                     <td className="py-3 px-3">
                       <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-rose-950/50 border border-rose-800/50 text-rose-300">
                         {p.stock} units

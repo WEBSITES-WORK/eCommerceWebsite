@@ -1,28 +1,40 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { Shield, Lock, Mail, ArrowRight, ShieldCheck } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
 
 const AdminLogin = () => {
-  const { login } = useAuth();
+  const { login, logout, user, isAuthenticated, isAdmin } = useAuth();
   const { showToast } = useToast();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    if (isAuthenticated && isAdmin) {
+      const params = new URLSearchParams(location.search);
+      const redirect = params.get('redirect') || '/admin';
+      navigate(redirect, { replace: true });
+    }
+  }, [isAuthenticated, isAdmin, navigate, location.search]);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       setLoading(true);
-      const user = await login(email, password);
-      if (user.role !== 'admin') {
+      const loggedUser = await login(email, password);
+      if (loggedUser.role !== 'admin') {
+        await logout(false);
         showToast('Access denied. Administrator privileges required.', 'error');
         return;
       }
-      navigate('/admin');
+      const params = new URLSearchParams(location.search);
+      const redirect = params.get('redirect') || '/admin';
+      navigate(redirect, { replace: true });
     } catch (err) {
       showToast(err.message || 'Admin authentication failed', 'error');
     } finally {

@@ -478,10 +478,12 @@ const ProductList = () => {
                       </td>
                       <td className="py-3 px-4">
                         <div className="flex flex-col">
-                          <span className="font-semibold text-[#F5F7FA]">${effectivePrice.toFixed(2)}</span>
-                          {p.discountPrice > 0 && (
+                          <span className="font-semibold text-[#F5F7FA]">
+                            ${Number(effectivePrice || 0).toFixed(2)}
+                          </span>
+                          {Number(p.discountPrice || 0) > 0 && (
                             <span className="text-[10px] text-[#707887] line-through">
-                              ${p.price.toFixed(2)}
+                              ${Number(p.price || 0).toFixed(2)}
                             </span>
                           )}
                         </div>

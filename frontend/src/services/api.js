@@ -38,8 +38,20 @@ export const dispatchSupabaseRequest = async (config) => {
   if (!isSupabaseConfigured) return null;
 
   const rawUrl = config.url || '';
-  const url = rawUrl.replace(/^\/api/, '');
+  const urlWithoutApi = rawUrl.replace(/^\/api/, '');
+  const [pathname, search] = urlWithoutApi.split('?');
+  const url = pathname.replace(/\/+$/, '') || '/';
   const method = (config.method || 'get').toLowerCase();
+
+  let params = { ...(config.params || {}) };
+  if (search) {
+    const searchParams = new URLSearchParams(search);
+    for (const [key, value] of searchParams.entries()) {
+      if (params[key] === undefined) {
+        params[key] = value;
+      }
+    }
+  }
 
   let body = config.data;
   if (typeof body === 'string') {
@@ -52,7 +64,7 @@ export const dispatchSupabaseRequest = async (config) => {
 
   try {
     // 1. Catalog & Store Settings (Products, Categories, Brands, Reviews by Product)
-    const catalogRes = await handleCatalogRequest(url, method, config.params);
+    const catalogRes = await handleCatalogRequest(url, method, params);
     if (catalogRes) return catalogRes;
 
     // 2. Shopping Cart & Coupons
@@ -60,15 +72,15 @@ export const dispatchSupabaseRequest = async (config) => {
     if (cartRes) return cartRes;
 
     // 3. Checkout, Customer Orders, Admin Order Tracking
-    const ordersRes = await handleOrdersRequest(url, method, body, config.params);
+    const ordersRes = await handleOrdersRequest(url, method, body, params);
     if (ordersRes) return ordersRes;
 
     // 4. Wishlist, Addresses, Reviews, Coupons, Notifications, User Profiles
-    const userRes = await handleUserFeaturesRequest(url, method, body, config.params);
+    const userRes = await handleUserFeaturesRequest(url, method, body, params);
     if (userRes) return userRes;
 
     // 5. Admin Dashboard, Product/Category/Brand Mutations, Bulk Operations
-    const adminRes = await handleAdminRequest(url, method, body, config.params);
+    const adminRes = await handleAdminRequest(url, method, body, params);
     if (adminRes) return adminRes;
 
     // 6. Direct Storage File Uploads

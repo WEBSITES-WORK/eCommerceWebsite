@@ -148,7 +148,7 @@ const OrderDetail = () => {
             Order Total
           </span>
           <span className="text-2xl font-black text-[#F5F7FA]">
-            ${order.totalPrice?.toFixed(2)}
+            ${Number(order.totalPrice || 0).toFixed(2)}
           </span>
         </div>
       </div>
@@ -282,7 +282,7 @@ const OrderDetail = () => {
                     <div className="min-w-0">
                       <p className="font-bold text-[#F5F7FA] truncate text-xs">{item.title}</p>
                       <p className="text-[11px] text-[#A5ACB8]">
-                        Qty: {item.quantity} × ${item.price?.toFixed(2)}
+                        Qty: {item.quantity} × ${Number(item.price || 0).toFixed(2)}
                       </p>
                       {item.variant && (
                         <p className="text-[10px] text-[#707887]">Variant: {item.variant}</p>
@@ -291,7 +291,7 @@ const OrderDetail = () => {
                   </div>
 
                   <span className="font-black text-[#F5F7FA] text-xs flex-shrink-0">
-                    ${(item.price * item.quantity).toFixed(2)}
+                    ${(Number(item.price || 0) * Number(item.quantity || 1)).toFixed(2)}
                   </span>
                 </div>
               ))}
@@ -342,31 +342,31 @@ const OrderDetail = () => {
             <div className="space-y-2 text-xs divide-y divide-[#252B35]">
               <div className="flex justify-between py-1 text-[#A5ACB8]">
                 <span>Items Subtotal</span>
-                <span className="font-bold text-[#F5F7FA]">${order.itemsPrice?.toFixed(2)}</span>
+                <span className="font-bold text-[#F5F7FA]">${Number(order.itemsPrice || 0).toFixed(2)}</span>
               </div>
 
               <div className="flex justify-between py-1 text-[#A5ACB8]">
                 <span>Shipping Cost</span>
                 <span className="font-bold text-[#F5F7FA]">
-                  {order.shippingPrice > 0 ? `$${order.shippingPrice.toFixed(2)}` : 'FREE'}
+                  {Number(order.shippingPrice || 0) > 0 ? `$${Number(order.shippingPrice || 0).toFixed(2)}` : 'FREE'}
                 </span>
               </div>
 
               <div className="flex justify-between py-1 text-[#A5ACB8]">
                 <span>Estimated Tax</span>
-                <span className="font-bold text-[#F5F7FA]">${order.taxPrice?.toFixed(2)}</span>
+                <span className="font-bold text-[#F5F7FA]">${Number(order.taxPrice || 0).toFixed(2)}</span>
               </div>
 
-              {order.discountAmount > 0 && (
+              {Number(order.discountAmount || 0) > 0 && (
                 <div className="flex justify-between py-1 text-emerald-400 font-bold">
                   <span>Coupon Discount ({order.couponCode || 'PROMO'})</span>
-                  <span>-${order.discountAmount.toFixed(2)}</span>
+                  <span>-${Number(order.discountAmount || 0).toFixed(2)}</span>
                 </div>
               )}
 
               <div className="flex justify-between pt-2 text-[#F5F7FA] font-black text-sm">
                 <span>Grand Total</span>
-                <span>${order.totalPrice?.toFixed(2)}</span>
+                <span>${Number(order.totalPrice || 0).toFixed(2)}</span>
               </div>
             </div>
 

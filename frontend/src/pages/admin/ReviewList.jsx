@@ -14,7 +14,7 @@ const ReviewList = () => {
       setLoading(true);
       const res = await api.get('/reviews');
       if (res.success && res.data) {
-        setReviews(res.data.reviews);
+        setReviews(Array.isArray(res.data.reviews) ? res.data.reviews : Array.isArray(res.data) ? res.data : []);
       }
     } catch (err) {
       console.error('Failed to load reviews:', err);
